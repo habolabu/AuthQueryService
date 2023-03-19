@@ -1,0 +1,20 @@
+# spring config
+spring:
+  # mongo config
+  data:
+    mongodb:
+      uri: ${MONGODB_URI}
+      database: ${MONGODB_DATABASE}
+
+# security config
+security:
+  jwt:
+    tokenGeneration: ${JWT_TOKEN_GENERATION}
+    tokenRefresh: ${JWT_TOKEN_REFRESH}
+    clientId: ${JWT_CLIENT_ID}
+    clientSecret: ${JWT_CLIENT_SECRET}
+    grantTypeGenerate: ${JWT_GRANT_TYPE_GENERATE}
+    grantTypeRefresh: ${JWT_GRANT_TYPE_REFRESH}
+    audience: ${JWT_AUDIENCE}
+    authorizedParties: ${JWT_AUTHORIZED_PARTIES}
+    issuer: ${JWT_ISSUER}
