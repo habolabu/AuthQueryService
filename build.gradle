@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        coreServiceVersion= "1.0.0"
+        coreServiceVersion = "1.0.0"
         springBootVersion = "2.7.4"
         springDependencyManagementVersion = "1.0.12.RELEASE"
         jaxbApiVersion = "2.4.0-b180830.0359"
@@ -44,11 +44,14 @@ configurations {
 repositories {
     mavenCentral()
     mavenLocal()
+    maven {
+        url = uri('https://maven.pkg.github.com/habolabu/CoreService')
+    }
 }
 
 dependencies {
     testImplementation "org.springframework.boot:spring-boot-starter-test"
-    implementation "edu.ou:CoreService:${coreServiceVersion}"
+    implementation "edu.ou:coreservice:${coreServiceVersion}"
     implementation "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
     implementation "org.springframework.boot:spring-boot-starter:${springBootVersion}"
     implementation "org.springframework.boot:spring-boot-starter-data-mongodb"
