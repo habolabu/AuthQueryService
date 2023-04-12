@@ -39,9 +39,3 @@ security:
     audience: ${JWT_AUDIENCE:account}
     authorizedParties: ${JWT_AUTHORIZED_PARTIES:habolabu-back-end-service}
     issuer: ${JWT_ISSUER:https://keycloak-habolabu-nguyentrungkien01.cloud.okteto.net/auth/realms/Habolabu}
-
-# log config
-logging:
-  level:
-    root: debug
-    org.springframework.data.mongodb.core.MongoTemplate: debug

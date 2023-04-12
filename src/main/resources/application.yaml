@@ -1,10 +1,31 @@
+# application config
+server:
+  port: ${SERVER_PORT}
+  servlet:
+    context-path: ${SERVER_CONTEXT_PATH}
+
 # spring config
 spring:
+  application:
+    name: ${APPLICATION_NAME}
+
   # mongo config
   data:
     mongodb:
       uri: ${MONGODB_URI}
       database: ${MONGODB_DATABASE}
+
+  # rabbitmq config
+  rabbitmq:
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
+    virtual-host: ${RABBITMQ_VIRTUAL_HOST}
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
+    ignoreDeclarationException: ${RABBITMQ_IGNORE_DECLARATION_EXCEPTION}
+    concurrentConsumers: ${RABBITMQ_CONCURRENT_CONSUMERS}
+    maxConcurrentConsumers: ${RABBITMQ_MAX_CONCURRENT_CONSUMERS}
+    receiveTimeout: ${RABBITMQ_RECEIVE_TIMEOUT}
 
 # security config
 security:
