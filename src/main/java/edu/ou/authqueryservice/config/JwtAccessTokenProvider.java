@@ -152,7 +152,7 @@ public class JwtAccessTokenProvider {
         );
 
         if (new Date(Calendar.getInstance().getTimeInMillis())
-                .after(new Date(Long.parseLong(expiredDate)))) {
+                .after(new Date(Long.parseLong(expiredDate) * 1000))) {
             final Map<String, String> params = Map.of(
                     "client_id", clientId,
                     "client_secret", clientSecret,
