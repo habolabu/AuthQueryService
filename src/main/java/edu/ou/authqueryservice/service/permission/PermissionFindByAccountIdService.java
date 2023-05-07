@@ -3,7 +3,9 @@ package edu.ou.authqueryservice.service.permission;
 import edu.ou.authqueryservice.common.constant.CodeStatus;
 import edu.ou.authqueryservice.data.entity.AccountSettingDocument;
 import edu.ou.authqueryservice.data.entity.PermissionDocument;
+import edu.ou.authqueryservice.data.entity.RoleDocument;
 import edu.ou.authqueryservice.data.pojo.request.permission.PermissionFindByAccountIdRequest;
+import edu.ou.authqueryservice.data.pojo.response.permission.PermissionFindByAccountIdResponse;
 import edu.ou.coreservice.common.constant.Message;
 import edu.ou.coreservice.common.exception.BusinessException;
 import edu.ou.coreservice.common.validate.ValidValidation;
@@ -16,6 +18,7 @@ import edu.ou.coreservice.service.base.BaseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -25,6 +28,7 @@ import java.util.stream.Collectors;
 public class PermissionFindByAccountIdService extends BaseService<IBaseRequest, IBaseResponse> {
     private final IBaseRepository<List<Integer>, List<PermissionDocument>> permissionFindByPermissionIdsRepository;
     private final IBaseRepository<Integer, List<AccountSettingDocument>> accountSettingFindByAccountIdRepository;
+    private final IBaseRepository<Integer, RoleDocument> roleFindByRoleIdRepository;
     private final ValidValidation validValidation;
 
     /**
@@ -56,28 +60,48 @@ public class PermissionFindByAccountIdService extends BaseService<IBaseRequest, 
         final List<AccountSettingDocument> accountSettingDocuments = accountSettingFindByAccountIdRepository
                 .execute(permissionFindByAccountIdRequest.getAccountId());
 
-        final List<Integer> permissionIds = accountSettingDocuments
+        final Map<Integer, List<Integer>> roles = accountSettingDocuments
                 .stream()
-                .map(AccountSettingDocument::getPermissionId)
-                .collect(Collectors.toSet())
+                .collect(Collectors.groupingBy(AccountSettingDocument::getRoleId))
+                .entrySet()
                 .stream()
-                .toList();
-
-        final List<PermissionDocument> permissionDocuments =
-                permissionFindByPermissionIdsRepository.execute(permissionIds);
-
-        final Map<Integer, Boolean> settingsMap = accountSettingDocuments
-                .stream()
+                .map(e ->
+                        Map.entry(
+                                e.getKey(),
+                                e.getValue()
+                                        .stream()
+                                        .map(AccountSettingDocument::getPermissionId)
+                                        .collect(Collectors.toList())))
                 .collect(Collectors.toMap(
-                        AccountSettingDocument::getPermissionId,
-                        AccountSettingDocument::isStatus));
+                        Map.Entry::getKey,
+                        Map.Entry::getValue));
 
-        permissionDocuments.forEach(permissionDocument ->
-                permissionDocument.setStatus(settingsMap.get(permissionDocument.getOId())));
+        final List<PermissionFindByAccountIdResponse> permissionFindByAccountIdResponses = new ArrayList<>();
+
+        roles.forEach((key, value) -> {
+            final RoleDocument roleDocument = roleFindByRoleIdRepository.execute(key);
+            final List<PermissionDocument> permissionDocuments = permissionFindByPermissionIdsRepository.execute(value);
+
+            final Map<Integer, Boolean> settingsMap = accountSettingDocuments
+                    .stream()
+                    .collect(Collectors.toMap(
+                            AccountSettingDocument::getPermissionId,
+                            AccountSettingDocument::isStatus));
+
+            permissionDocuments.forEach(permissionDocument ->
+                    permissionDocument.setStatus(settingsMap.get(permissionDocument.getOId())));
+
+            permissionFindByAccountIdResponses.add(
+                    new PermissionFindByAccountIdResponse()
+                            .setRoleId(roleDocument.getOId())
+                            .setRoleName(roleDocument.getName())
+                            .setRoleDisplay(roleDocument.getDisplay())
+                            .setPermissions(permissionDocuments));
+        });
 
         return new SuccessResponse<>(
                 new SuccessPojo<>(
-                        permissionDocuments,
+                        permissionFindByAccountIdResponses,
                         CodeStatus.SUCCESS,
                         Message.Success.SUCCESSFUL
                 )
