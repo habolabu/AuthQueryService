@@ -58,6 +58,7 @@ public class AccountGetDetailListener implements IBaseListener<String, Map<Strin
         return new HashMap<>() {
             {
                 put("username", accountDocument.getUsername());
+                put("accountId", accountDocument.getOId());
                 put("userId", String.valueOf(accountDocument.getUserId()));
                 put("password", passwordDocument.getPassword());
                 put("permissions", new ArrayList<>(permissions));
