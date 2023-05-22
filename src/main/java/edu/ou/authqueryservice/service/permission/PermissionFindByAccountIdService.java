@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -99,12 +100,11 @@ public class PermissionFindByAccountIdService extends BaseService<IBaseRequest, 
             final List<PermissionDocument> originalPermissionDocuments  = permissionFindAllRepository.execute(new Query());
 
             originalPermissionDocuments.forEach(originalPermissionDocument -> {
-                if (permissionDocuments.stream()
+                final Optional<PermissionDocument> permissionDocumentOptional = permissionDocuments.stream()
                         .filter(permissionDocument -> permissionDocument.getOId() == originalPermissionDocument.getOId())
-                        .toList()
-                        .size() > 0) {
-                    originalPermissionDocument.setStatus(true);
-                }
+                        .findFirst();
+                permissionDocumentOptional.ifPresent(permissionDocument ->
+                        originalPermissionDocument.setStatus(permissionDocument.isStatus()));
             });
 
             final List<PermissionDocument> labelPermissionDocuments = originalPermissionDocuments
